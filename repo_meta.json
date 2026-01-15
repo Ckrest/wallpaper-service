@@ -1,0 +1,7 @@
+{
+  "name": "wallpaper-service",
+  "description": "Unified wallpaper daemon for Wayland with seamless hot-swap transitions",
+  "topics": ["wallpaper", "wayland", "daemon", "video", "python"],
+  "private": false,
+  "homepage": "https://ckrest.dev/projects/wallpaper-service/"
+}
