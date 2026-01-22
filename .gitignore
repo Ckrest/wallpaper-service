@@ -5,3 +5,7 @@ venv/
 
 # OS
 .DS_Store
+
+# Systems integration (tracked by vcsh systems)
+manifest.yaml
+NOTES.md

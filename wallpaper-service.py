@@ -202,7 +202,7 @@ class SwaybgImageProcess(WallpaperProcess):
 
     def _build_command(self) -> list[str]:
         return [
-            "/usr/bin/swaybg",
+            "swaybg",
             "-o", self.output,
             "-i", str(self.image_path),
             "-m", "fill",
@@ -218,7 +218,7 @@ class SwaybgColorProcess(WallpaperProcess):
 
     def _build_command(self) -> list[str]:
         return [
-            "/usr/bin/swaybg",
+            "swaybg",
             "-o", self.output,
             "-c", self.color,
         ]
