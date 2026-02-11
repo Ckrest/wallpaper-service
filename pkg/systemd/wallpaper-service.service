@@ -5,8 +5,8 @@ Wants=monitor-detect.service
 
 [Service]
 Type=simple
-WorkingDirectory=%h/Systems/desktop/wallpaper-service
-ExecStart=%h/Systems/desktop/wallpaper-service/src/wallpaper_service/wallpaper_service.py
+WorkingDirectory=-/home/nick/.local/share/wallpaper-service
+ExecStart=/usr/local/bin/wallpaper-service
 Restart=on-failure
 RestartSec=3
 

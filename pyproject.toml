@@ -8,6 +8,9 @@ license = {file = "LICENSE"}
 authors = [{name = "Ckrest"}]
 dependencies = []
 
+[project.scripts]
+wallpaper-service = "wallpaper_service.wallpaper_service:main"
+
 [project.urls]
 Repository = "https://github.com/Ckrest/wallpaper-service"
 

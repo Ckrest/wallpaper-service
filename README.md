@@ -17,14 +17,25 @@ The daemon uses a hot-swap mechanism:
 2. Old wallpaper killed AFTER new is running
 3. Result: seamless transition
 
+## Installation
+
+```bash
+# Install in editable mode
+pip install -e .
+
+# Enable systemd service
+systemctl --user daemon-reload
+systemctl --user enable --now wallpaper-service
+```
+
 ## Usage
 
 ```bash
 # Run as daemon
-wallpaper-service.py
+wallpaper-service
 
-# Test mode (set and exit)
-wallpaper-service.py --once
+# Test mode (set wallpaper and exit)
+wallpaper-service --once
 ```
 
 ## Configuration
@@ -40,12 +51,12 @@ Config file: `~/.config/settings-hub/wallpaper.json`
 
 Reload config:
 ```bash
-systemctl --user kill -s HUP wallpaper.service
+systemctl --user kill -s HUP wallpaper-service
 ```
 
 ## Requirements
 
-- Python 3.8+
+- Python 3.10+
 - swaybg (for static images)
 - mpvpaper (for video wallpapers)
 
