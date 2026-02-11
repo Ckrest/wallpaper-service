@@ -6,6 +6,17 @@ venv/
 # OS
 .DS_Store
 
-# Systems integration (tracked by vcsh systems)
 manifest.yaml
 NOTES.md
+
+# Published package requirements
+.env
+.idea/
+.vscode/
+build/
+dist/
+*.log
+*.db
+*.sqlite3
+*.pkl
+*.pt

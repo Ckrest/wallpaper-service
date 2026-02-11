@@ -12,7 +12,7 @@ Hot-swap mechanism:
 4. Result: seamless transition with no visible gap
 
 Settings Hub controls wallpapers by:
-1. Modifying ~/.config/settings-hub/wallpaper.json
+1. Modifying the settings-hub wallpaper config (XDG_CONFIG_HOME/settings-hub/wallpaper.json)
 2. Sending SIGHUP: systemctl --user kill -s HUP wallpaper.service
 
 Usage:

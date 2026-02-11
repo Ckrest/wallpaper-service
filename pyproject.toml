@@ -1,0 +1,16 @@
+[project]
+name = "wallpaper-service"
+description = "Desktop wallpaper daemon with hot-swap transitions for video, image, and solid color backgrounds"
+version = "0.1.0"
+requires-python = ">=3.10"
+readme = "README.md"
+license = {file = "LICENSE"}
+authors = [{name = "Ckrest"}]
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/Ckrest/wallpaper-service"
+
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"

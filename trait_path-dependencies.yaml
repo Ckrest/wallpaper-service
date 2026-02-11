@@ -1,0 +1,15 @@
+# wallpaper-service - path-dependencies trait
+
+paths:
+- path: ~/.config/settings-hub/wallpaper.json
+  purpose: Configuration file (managed by settings-hub)
+  type: config
+- path: mpvpaper
+  purpose: Video wallpaper renderer (must be in PATH)
+  type: binary
+- path: swaybg
+  purpose: Static image/color renderer (must be in PATH)
+  type: binary
+- path: /run/user/$UID/primary-monitor
+  purpose: Monitor detection (from monitor-detect.service)
+  type: file
