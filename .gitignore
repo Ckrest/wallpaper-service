@@ -15,6 +15,7 @@ NOTES.md
 .vscode/
 build/
 dist/
+*.egg-info/
 *.log
 *.db
 *.sqlite3
