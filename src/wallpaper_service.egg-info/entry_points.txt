@@ -1,0 +1,2 @@
+[console_scripts]
+wallpaper-service = wallpaper_service.wallpaper_service:main
