@@ -44,15 +44,30 @@ Config file: `~/.config/settings-hub/wallpaper.json`
 
 ```json
 {
-  "type": "video",
-  "path": "/path/to/video.mp4"
+  "active_type": "video",
+  "video": {
+    "path": "/path/to/video.mp4",
+    "loop": true
+  },
+  "image": {
+    "path": "/path/to/image.jpg",
+    "fit": "fill"
+  },
+  "solid": {
+    "color": "#1a1a2e"
+  }
 }
 ```
+
+`active_type` supports: `video`, `image`, `solid`.
+`image.fit` supports: `fill`, `fit`, `center`, `stretch`, `tile`.
 
 Reload config:
 ```bash
 systemctl --user kill -s HUP wallpaper-service
 ```
+
+Settings Hub integration is provided through `trait_settings-hub.yaml`, so Appearance controls are rendered as a trait-driven external package.
 
 ## Requirements
 

@@ -13,7 +13,7 @@ Hot-swap mechanism:
 
 Settings Hub controls wallpapers by:
 1. Modifying the settings-hub wallpaper config (XDG_CONFIG_HOME/settings-hub/wallpaper.json)
-2. Sending SIGHUP: systemctl --user kill -s HUP wallpaper.service
+2. Sending SIGHUP: systemctl --user kill -s HUP wallpaper-service
 
 Usage:
     wallpaper-service.py [--once]
@@ -58,6 +58,8 @@ class WallpaperConfig:
     video_path: Optional[Path]
     image_path: Optional[Path]
     solid_color: str
+    video_loop: bool
+    image_fit: str
 
     @classmethod
     def load(cls) -> WallpaperConfig:
@@ -67,6 +69,8 @@ class WallpaperConfig:
         video_path = None
         image_path = None
         solid_color = "#1a1a2e"
+        video_loop = True
+        image_fit = "fill"
 
         if CONFIG_FILE.exists():
             try:
@@ -78,33 +82,65 @@ class WallpaperConfig:
                         active_type = WallpaperType(data["active_type"])
                     except ValueError:
                         log.warning(f"Invalid active_type: {data['active_type']}")
+                elif "type" in data:
+                    try:
+                        active_type = WallpaperType(data["type"])
+                    except ValueError:
+                        log.warning(f"Invalid type: {data['type']}")
 
                 if "video" in data and data["video"].get("path"):
                     video_path = Path(data["video"]["path"])
+                if "video" in data and "loop" in data["video"]:
+                    loop_raw = data["video"]["loop"]
+                    if isinstance(loop_raw, bool):
+                        video_loop = loop_raw
+                    elif isinstance(loop_raw, str):
+                        video_loop = loop_raw.strip().lower() in {"1", "true", "yes", "on"}
+                    else:
+                        video_loop = bool(loop_raw)
 
                 if "image" in data and data["image"].get("path"):
                     image_path = Path(data["image"]["path"])
+                if "image" in data and data["image"].get("fit"):
+                    image_fit = str(data["image"]["fit"]).strip().lower()
 
                 if "solid" in data and data["solid"].get("color"):
                     solid_color = data["solid"]["color"]
 
+                # Compatibility: legacy single-path payload.
+                if "path" in data and data["path"]:
+                    legacy_path = Path(str(data["path"]))
+                    if active_type == WallpaperType.VIDEO and video_path is None:
+                        video_path = legacy_path
+                    if active_type == WallpaperType.IMAGE and image_path is None:
+                        image_path = legacy_path
+
             except Exception as e:
                 log.warning(f"Failed to load config: {e}")
+
+        if image_fit == "cover":
+            image_fit = "fill"
+        elif image_fit == "contain":
+            image_fit = "fit"
+        if image_fit not in {"fill", "fit", "center", "stretch", "tile"}:
+            image_fit = "fill"
 
         return cls(
             active_type=active_type,
             video_path=video_path,
             image_path=image_path,
             solid_color=solid_color,
+            video_loop=video_loop,
+            image_fit=image_fit,
         )
 
     @property
     def identity(self) -> str:
         """Unique identifier for change detection."""
         if self.active_type == WallpaperType.VIDEO:
-            return f"video:{self.video_path}"
+            return f"video:{self.video_path}:loop={self.video_loop}"
         elif self.active_type == WallpaperType.IMAGE:
-            return f"image:{self.image_path}"
+            return f"image:{self.image_path}:fit={self.image_fit}"
         else:
             return f"solid:{self.solid_color}"
 
@@ -174,14 +210,18 @@ class WallpaperProcess(ABC):
 class MpvPaperProcess(WallpaperProcess):
     """Video wallpaper using mpvpaper."""
 
-    def __init__(self, output: str, video_path: Path):
+    def __init__(self, output: str, video_path: Path, *, loop: bool = True):
         super().__init__(output)
         self.video_path = video_path
+        self.loop = loop
 
     def _build_command(self) -> list[str]:
+        options = "no-audio --really-quiet"
+        if self.loop:
+            options = "no-audio loop --really-quiet"
         return [
             "mpvpaper",
-            "-o", "no-audio loop --really-quiet",
+            "-o", options,
             self.output,
             str(self.video_path),
         ]
@@ -196,16 +236,17 @@ class MpvPaperProcess(WallpaperProcess):
 class SwaybgImageProcess(WallpaperProcess):
     """Static image wallpaper using swaybg."""
 
-    def __init__(self, output: str, image_path: Path):
+    def __init__(self, output: str, image_path: Path, *, mode: str = "fill"):
         super().__init__(output)
         self.image_path = image_path
+        self.mode = mode
 
     def _build_command(self) -> list[str]:
         return [
             "swaybg",
             "-o", self.output,
             "-i", str(self.image_path),
-            "-m", "fill",
+            "-m", self.mode,
         ]
 
 
@@ -318,8 +359,8 @@ class WallpaperDaemon:
     def _create_process(self, config: WallpaperConfig, output: str) -> Optional[WallpaperProcess]:
         """Create appropriate wallpaper process based on config with fallback chain."""
         attempts = [
-            (WallpaperType.VIDEO, config.video_path, lambda p: MpvPaperProcess(output, p)),
-            (WallpaperType.IMAGE, config.image_path, lambda p: SwaybgImageProcess(output, p)),
+            (WallpaperType.VIDEO, config.video_path, lambda p: MpvPaperProcess(output, p, loop=config.video_loop)),
+            (WallpaperType.IMAGE, config.image_path, lambda p: SwaybgImageProcess(output, p, mode=config.image_fit)),
             (WallpaperType.SOLID, None, lambda _: SwaybgColorProcess(output, config.solid_color)),
         ]
 
