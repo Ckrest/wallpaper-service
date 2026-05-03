@@ -10,6 +10,7 @@ dependencies = []
 
 [project.scripts]
 wallpaper-service = "wallpaper_service.wallpaper_service:main"
+wallpaper-settings-hub = "wallpaper_service.settings_hub_bridge:main"
 
 [project.urls]
 Repository = "https://github.com/Ckrest/wallpaper-service"
