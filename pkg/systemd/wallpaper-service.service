@@ -2,9 +2,11 @@
 Description=Desktop Wallpaper (video/image/color)
 After=graphical-session.target monitor-detect.service
 Wants=monitor-detect.service
+PartOf=graphical-session.target
 
 [Service]
 Type=simple
+Slice=session-graphical.slice
 WorkingDirectory=%h/Systems/desktop/wallpaper-service
 ExecStart=%h/Systems/desktop/wallpaper-service/src/wallpaper_service/wallpaper_service.py
 Restart=on-failure
